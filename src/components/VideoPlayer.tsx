@@ -62,6 +62,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoId, videoUrl }) => {
             onProgress={handleProgress}
             onDuration={handleDuration}
             config={{
+              youtube: {
+                playerVars: {
+                  modestbranding: 1,
+                  rel: 0
+                }
+              },
               file: {
                 attributes: {
                   crossOrigin: "anonymous",

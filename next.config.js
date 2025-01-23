@@ -4,15 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'picsum.photos'
-      },
-      {
-        protocol: 'https',
-        hostname: 'upload.wikimedia.org'
-      },
-      {
-        protocol: 'http',
-        hostname: 'commondatastorage.googleapis.com'
+        hostname: 'cdn.myanimelist.net'
       }
     ]
   },
