@@ -67,17 +67,21 @@ const WatchPage: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-12 gap-4 p-4">
-      <div className="col-span-12 lg:col-span-8">
-        <VideoPlayer videoId={video.id} videoUrl={video.videoUrl} />
-        <VideoInfo video={video} />
-        <CommentSection videoId={video.id} />
-      </div>
-      <div className="col-span-12 lg:col-span-4">
-        <RelatedVideos videos={relatedVideos} />
+    <div className="container mx-auto px-4 py-6">
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          <div className="bg-black rounded-xl overflow-hidden shadow-lg">
+            <VideoPlayer videoId={video.id} videoUrl={video.videoUrl} />
+          </div>
+          <VideoInfo video={video} />
+          <CommentSection videoId={video.id} />
+        </div>
+        <div className="col-span-12 lg:col-span-4 space-y-4">
+          <RelatedVideos videos={relatedVideos} />
+        </div>
       </div>
     </div>
   );
 };
 
-export default WatchPage; 
+export default WatchPage;
