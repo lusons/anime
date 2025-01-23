@@ -1,33 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Video } from '@/types';
+import { videoService } from '@/services/videoService';
 
-const violetEvergardenVideos: Video[] = [
-  {
-    id: 'ep1',
-    title: '第1话「我爱你」与自动手记人偶',
-    description: '在战争结束后，曾是军人的薇尔莉特·伊芙加登开始在CH邮政公司工作，并了解到「自动手记人偶」这一职业。',
-    thumbnailUrl: 'https://via.placeholder.com/480x270.png?text=EP1',
-    videoUrl: 'https://example.com/violet-evergarden/ep1',
-    views: 1500000,
-    uploadDate: '2018-01-11',
-    userId: 'KyoaniOfficial'
-  },
-  {
-    id: 'ep2',
-    title: '第2话 离别之时所需之物',
-    description: '薇尔莉特开始以见习生的身份，在自动手记人偶养成学校学习。',
-    thumbnailUrl: 'https://via.placeholder.com/480x270.png?text=EP2',
-    videoUrl: 'https://example.com/violet-evergarden/ep2',
-    views: 1200000,
-    uploadDate: '2018-01-18',
-    userId: 'KyoaniOfficial'
-  },
-];
+const VioletEvergardenPage: React.FC = () => {
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const VioletEvergardenPage = () => {
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        setLoading(true);
+        const violetVideos = await videoService.getVioletEvergardenVideos();
+        setVideos(violetVideos);
+      } catch (err) {
+        console.error('Failed to fetch videos:', err);
+        setError('加载视频失败');
+        // 使用备用数据
+        setVideos([
+          {
+            id: 'violet-ep1',
+            title: '第1话「我爱你」与自动手记人偶',
+            description: '在战争结束后，曾是军人的薇尔莉特·伊芙加登为了理解少校给她的最后话语「我爱你」的含义，成为了一名自动手记人偶...',
+            thumbnailUrl: 'https://cdn.myanimelist.net/images/anime/1329/93857.jpg',
+            videoUrl: 'https://www.youtube.com/embed/g5xWh2kgVlE',
+            views: 1500000,
+            likes: 125000,
+            uploadDate: new Date('2018-01-11'),
+            userId: 'Kyoto Animation'
+          },
+          {
+            id: 'violet-ep2',
+            title: '第2话 离别之时所留下的一切',
+            description: '薇尔莉特开始了她作为自动手记人偶的第一份工作，为了完成委托，她必须学会理解他人的感情...',
+            thumbnailUrl: 'https://cdn.myanimelist.net/images/anime/1329/93857.jpg',
+            videoUrl: 'https://www.youtube.com/embed/BUfSen2rYQs',
+            views: 1200000,
+            likes: 98000,
+            uploadDate: new Date('2018-01-18'),
+            userId: 'Kyoto Animation'
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -56,7 +80,7 @@ const VioletEvergardenPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {violetEvergardenVideos.map((video, index) => (
+        {videos.map((video, index) => (
           <motion.div
             key={video.id}
             initial={{ opacity: 0, y: 20 }}
@@ -92,7 +116,7 @@ const VioletEvergardenPage = () => {
                     {video.title}
                   </h3>
                   <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>{new Date(video.uploadDate).toLocaleDateString('zh-CN')}</span>
+                    <span>{video.uploadDate.toLocaleDateString('zh-CN')}</span>
                     <span>{video.views.toLocaleString()}次观看</span>
                   </div>
                 </div>
