@@ -7,14 +7,26 @@ interface VideoInfoProps {
 }
 
 const VideoInfo: React.FC<VideoInfoProps> = ({ video }) => {
+  // 根据频道名生成一个独特的渐变色
+  const getGradientColors = () => {
+    const colors = {
+      'Kyoto Animation': 'from-violet-400 to-purple-500',
+      'MAPPA': 'from-blue-400 to-indigo-500',
+      'ufotable': 'from-green-400 to-emerald-500',
+      'default': 'from-gray-400 to-gray-500'
+    };
+    return colors[video.userId as keyof typeof colors] || colors.default;
+  };
+
   return (
     <div className="p-4 bg-white rounded-xl shadow-sm">
       <h1 className="text-2xl font-bold text-gray-900 mb-4">{video.title}</h1>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center">
-          <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0"></div>
+          {/* 渐变色头像 */}
+          <div className={`w-12 h-12 rounded-full flex-shrink-0 bg-gradient-to-br ${getGradientColors()} animate-gradient`} />
           <div className="ml-4">
-            <p className="font-semibold text-gray-900">频道名称</p>
+            <p className="font-semibold text-gray-900">{video.userId}</p>
             <p className="text-sm text-gray-600">100万订阅</p>
           </div>
           <button className="ml-6 px-6 py-2.5 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors">

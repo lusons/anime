@@ -5,6 +5,14 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'cdn.myanimelist.net'
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com'
       }
     ]
   },

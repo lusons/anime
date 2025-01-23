@@ -22,7 +22,19 @@ export interface Comment {
   id: string;
   content: string;
   userId: string;
+  userAvatar?: string;
   videoId: string;
   likes: number;
   createdAt: Date;
+  score?: number;
+  reactions?: {
+    overall: number;
+    nice: number;
+    love_it: number;
+    funny: number;
+    confusing: number;
+    informative: number;
+    well_written: number;
+    creative: number;
+  };
 } 

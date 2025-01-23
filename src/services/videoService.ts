@@ -147,24 +147,50 @@ const additionalAnimeVideos = Array.from({ length: 15 }, (_, i) => ({
   userId: ['MAPPA', 'ufotable', 'Toei', 'A-1 Pictures', 'Bones'][Math.floor(Math.random() * 5)]
 }));
 
-// 合并所有视频
-const allVideos = [...mockVideos, ...additionalVideos, ...animeVideos, ...additionalAnimeVideos];
-
 class VideoService {
   private videos: Video[] = [];
   private initialized = false;
+
+  // 获取紫罗兰永恒花园的视频
+  async getVioletEvergardenVideos() {
+    try {
+      // 获取紫罗兰永恒花园的基本信息 (ID: 33352 是紫罗兰永恒花园的 MAL ID)
+      const violetInfo = await animeAPI.getAnimeById(33352);
+      const violetMovie = await animeAPI.getAnimeById(37987); // 剧场版
+      const violetSideStory = await animeAPI.getAnimeById(39741); // 外传
+
+      // 将动画信息转换为视频格式
+      const mainSeries = this.convertAnimeToVideo(violetInfo);
+      const movie = this.convertAnimeToVideo(violetMovie);
+      const sideStory = this.convertAnimeToVideo(violetSideStory);
+
+      // 获取相关视频
+      const relatedAnime = await animeAPI.searchAnime('Violet Evergarden');
+      const relatedVideos = relatedAnime
+        .filter(anime => anime.mal_id !== 33352) // 排除主系列
+        .map(this.convertAnimeToVideo);
+
+      return [mainSeries, movie, sideStory, ...relatedVideos];
+    } catch (error) {
+      console.error('Failed to fetch Violet Evergarden videos:', error);
+      return [];
+    }
+  }
 
   private convertAnimeToVideo(anime: AnimeResult): Video {
     return {
       id: `anime-${anime.mal_id}`,
       title: anime.title,
-      description: anime.synopsis,
+      description: anime.synopsis || '',
       thumbnailUrl: anime.images.jpg.large_image_url,
-      videoUrl: anime.trailer?.url || `https://www.youtube.com/watch?v=${anime.trailer?.youtube_id}`,
-      views: anime.members,
-      likes: Math.floor(anime.members * (anime.score / 10)),
-      uploadDate: new Date(anime.aired.from),
-      userId: anime.studios[0]?.name || 'Unknown Studio'
+      // 使用预告片链接，如果没有则使用默认图片
+      videoUrl: anime.trailer?.embed_url || 
+                `https://www.youtube.com/embed/${anime.trailer?.youtube_id}` || 
+                'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      views: anime.members || 0,
+      likes: Math.floor((anime.members || 0) * (anime.score || 7) / 10),
+      uploadDate: new Date(anime.aired?.from || Date.now()),
+      userId: anime.studios?.[0]?.name || 'Unknown Studio'
     };
   }
 
@@ -174,18 +200,20 @@ class VideoService {
     try {
       // 获取当季动漫
       const seasonalAnime = await animeAPI.getSeasonalAnime();
-      const seasonalVideos = seasonalAnime.map(this.convertAnimeToVideo);
+      const seasonalVideos = seasonalAnime.map(anime => this.convertAnimeToVideo(anime));
 
       // 获取热门动漫
       const topAnime = await animeAPI.getAnimeByType('tv');
-      const topVideos = topAnime.map(this.convertAnimeToVideo);
+      const topVideos = topAnime.map(anime => this.convertAnimeToVideo(anime));
 
-      this.videos = [...seasonalVideos, ...topVideos];
+      // 获取紫罗兰永恒花园系列
+      const violetVideos = await this.getVioletEvergardenVideos();
+
+      this.videos = [...seasonalVideos, ...topVideos, ...violetVideos];
       this.initialized = true;
     } catch (error) {
       console.error('Failed to initialize video service:', error);
-      // 使用备用数据
-      this.videos = [/* 你之前的静态数据作为备用 */];
+      this.videos = [];
     }
   }
 

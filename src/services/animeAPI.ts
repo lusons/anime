@@ -24,7 +24,15 @@ export interface AnimeResult {
   trailer: {
     youtube_id: string;
     url: string;
+    embed_url: string;
   };
+  genres: {
+    name: string;
+  }[];
+  episodes: number;
+  status: string;
+  season: string;
+  year: number;
 }
 
 export const animeAPI = {
@@ -36,7 +44,7 @@ export const animeAPI = {
 
   // 获取特定动漫的详情
   getAnimeById: async (id: number) => {
-    const response = await axios.get(`${BASE_URL}/anime/${id}`);
+    const response = await axios.get(`${BASE_URL}/anime/${id}/full`);
     return response.data.data as AnimeResult;
   },
 
@@ -50,5 +58,11 @@ export const animeAPI = {
   getAnimeByType: async (type: string) => {
     const response = await axios.get(`${BASE_URL}/top/anime?type=${type}`);
     return response.data.data as AnimeResult[];
+  },
+
+  // 获取动漫的相关推荐
+  getAnimeRecommendations: async (id: number) => {
+    const response = await axios.get(`${BASE_URL}/anime/${id}/recommendations`);
+    return response.data.data as { entry: AnimeResult }[];
   }
 }; 
